@@ -28,9 +28,12 @@ const (
 
 var (
 	errOpenFile               = errors.New("open file error")
-	errReadFile               = errors.New("open file error")
+	errReadFile               = errors.New("read from file error")
 	errParseFile              = errors.New("parsing file error")
+	errSeekFile               = errors.New("seek within file error")
+	errMalloc                 = errors.New("allocate memory error")
 	errInvalidWorkSheetNumber = errors.New("invalid worksheet number")
+	errUnknown                = errors.New("unknown error")
 )
 
 func (l libXLSErr) IntoErr() error {
@@ -40,15 +43,15 @@ func (l libXLSErr) IntoErr() error {
 	case errorOpen:
 		return errOpenFile
 	case errorSeek:
-		return errors.New("unknown error")
+		return errSeekFile
 	case errorRead:
 		return errReadFile
 	case errorParse:
 		return errParseFile
 	case errorMalloc:
-		return errors.New("unknown error")
+		return errMalloc
 	default:
-		return errors.New("unknown error")
+		return errUnknown
 	}
 }
 
