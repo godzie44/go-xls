@@ -52,12 +52,31 @@ func (l libXLSErr) IntoErr() error {
 	}
 }
 
-type WorkBook struct {
-	src *C.xlsWorkBook
+type (
+	WorkBook struct {
+		src *C.xlsWorkBook
 
-	SheetCount uint
-	sheetNames []string
-}
+		Summary *SummaryInfo
+
+		SheetCount     uint
+		ActiveSheetIdx int
+		Charset        string
+
+		sheetNames []string
+	}
+	SummaryInfo struct {
+		Title      string
+		Subject    string
+		Author     string
+		Keywords   string
+		Comment    string
+		LastAuthor string
+		AppName    string
+		Category   string
+		Manager    string
+		Company    string
+	}
+)
 
 func parseWorkBook(src *C.xlsWorkBook) (*WorkBook, error) {
 	cErr := C.xls_parseWorkBook(src)
@@ -78,10 +97,38 @@ func parseWorkBook(src *C.xlsWorkBook) (*WorkBook, error) {
 		sheetNames[i] = C.GoString(sheetData.name)
 	}
 
+	summary := C.xls_summaryInfo(src)
+	defer C.xls_close_summaryInfo(summary)
+
+	title := unsafe.Pointer(summary.title)
+	subj := unsafe.Pointer(summary.subject)
+	author := unsafe.Pointer(summary.author)
+	keywords := unsafe.Pointer(summary.keywords)
+	comment := unsafe.Pointer(summary.comment)
+	lastAuthor := unsafe.Pointer(summary.lastAuthor)
+	appName := unsafe.Pointer(summary.appName)
+	category := unsafe.Pointer(summary.category)
+	manager := unsafe.Pointer(summary.manager)
+	company := unsafe.Pointer(summary.company)
+
 	return &WorkBook{
 		src:        src,
 		SheetCount: sheetCount,
 		sheetNames: sheetNames,
+		Summary: &SummaryInfo{
+			Title:      C.GoString((*C.char)(title)),
+			Subject:    C.GoString((*C.char)(subj)),
+			Author:     C.GoString((*C.char)(author)),
+			Keywords:   C.GoString((*C.char)(keywords)),
+			Comment:    C.GoString((*C.char)(comment)),
+			LastAuthor: C.GoString((*C.char)(lastAuthor)),
+			AppName:    C.GoString((*C.char)(appName)),
+			Category:   C.GoString((*C.char)(category)),
+			Manager:    C.GoString((*C.char)(manager)),
+			Company:    C.GoString((*C.char)(company)),
+		},
+		ActiveSheetIdx: int(src.activeSheetIdx),
+		Charset:        C.GoString(src.charset),
 	}, nil
 }
 

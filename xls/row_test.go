@@ -13,7 +13,7 @@ func TestRowsExtract(t *testing.T) {
 		RowCount    int
 	}{
 		{smallFile, 0, 24},
-		{bigFile, 0, 7405},
+		{bigFile, 0, 7321},
 	}
 
 	for _, tc := range testCases {
