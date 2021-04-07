@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestOpenWorkSheet(t *testing.T) {
+func TestOpenWS(t *testing.T) {
 	testCases := []struct {
 		fName             string
 		existsSheetNum    int
@@ -32,7 +32,7 @@ func TestOpenWorkSheet(t *testing.T) {
 	}
 }
 
-func TestWorkSheetName(t *testing.T) {
+func TestWSName(t *testing.T) {
 	testCases := []struct {
 		fName                           string
 		firstSheetName, secondSheetName string

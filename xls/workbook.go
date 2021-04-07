@@ -103,21 +103,6 @@ func OpenFile(name string) (*WorkBook, error) {
 	return parseWorkBook(wb)
 }
 
-func (wb *WorkBook) OpenWorkSheet(number int) (*WorkSheet, error) {
-	cWS := C.xls_getWorkSheet(wb.src, C.int(number))
-	if cWS == nil {
-		return nil, errInvalidWorkSheetNumber
-	}
-
-	cErr := C.xls_parseWorkSheet(cWS)
-	err := libXLSErr(cErr).IntoErr()
-	if err != nil {
-		return nil, fmt.Errorf("work sheet %d: %w", number, err)
-	}
-
-	return &WorkSheet{src: cWS, Name: wb.sheetNames[number]}, nil
-}
-
 func (wb *WorkBook) Close() error {
 	C.xls_close_WB(wb.src)
 	return nil
