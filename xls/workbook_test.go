@@ -57,7 +57,7 @@ func TestWBSummaryInfo(t *testing.T) {
 func TestWBMeta(t *testing.T) {
 	testCases := []struct {
 		fName       string
-		activeSheet int
+		activeSheet uint
 		charset     string
 		sheetCount  uint
 	}{

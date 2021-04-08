@@ -62,10 +62,12 @@ type (
 		Summary *SummaryInfo
 
 		SheetCount     uint
-		ActiveSheetIdx int
+		ActiveSheetIdx uint
 		Charset        string
 
 		sheetNames []string
+
+		xf []*xf
 	}
 	SummaryInfo struct {
 		Title      string
@@ -88,49 +90,25 @@ func parseWorkBook(src *C.xlsWorkBook) (*WorkBook, error) {
 		return nil, fmt.Errorf("work book: %w", err)
 	}
 
-	sheetCount := uint(src.sheets.count)
+	sheetCnt := uint(uint32(src.sheets.count))
 
-	firstSheetDataPtr := unsafe.Pointer(src.sheets.sheet)
+	sheetDataPtr := unsafe.Pointer(src.sheets.sheet)
 	sheetDataSz := unsafe.Sizeof(C.st_sheet_data{})
-	sheetNames := make([]string, sheetCount)
-	for i := 0; i < int(sheetCount); i++ {
-		sheetDataPtr := unsafe.Pointer(uintptr(firstSheetDataPtr) + (uintptr(i) * sheetDataSz))
-
+	sheetNames := make([]string, sheetCnt)
+	for i := 0; i < int(sheetCnt); i++ {
 		sheetData := *(*C.st_sheet_data)(sheetDataPtr)
 		sheetNames[i] = C.GoString(sheetData.name)
+
+		sheetDataPtr = unsafe.Pointer(uintptr(sheetDataPtr) + sheetDataSz)
 	}
 
-	summary := C.xls_summaryInfo(src)
-	defer C.xls_close_summaryInfo(summary)
-
-	title := unsafe.Pointer(summary.title)
-	subj := unsafe.Pointer(summary.subject)
-	author := unsafe.Pointer(summary.author)
-	keywords := unsafe.Pointer(summary.keywords)
-	comment := unsafe.Pointer(summary.comment)
-	lastAuthor := unsafe.Pointer(summary.lastAuthor)
-	appName := unsafe.Pointer(summary.appName)
-	category := unsafe.Pointer(summary.category)
-	manager := unsafe.Pointer(summary.manager)
-	company := unsafe.Pointer(summary.company)
-
 	return &WorkBook{
-		src:        src,
-		SheetCount: sheetCount,
-		sheetNames: sheetNames,
-		Summary: &SummaryInfo{
-			Title:      C.GoString((*C.char)(title)),
-			Subject:    C.GoString((*C.char)(subj)),
-			Author:     C.GoString((*C.char)(author)),
-			Keywords:   C.GoString((*C.char)(keywords)),
-			Comment:    C.GoString((*C.char)(comment)),
-			LastAuthor: C.GoString((*C.char)(lastAuthor)),
-			AppName:    C.GoString((*C.char)(appName)),
-			Category:   C.GoString((*C.char)(category)),
-			Manager:    C.GoString((*C.char)(manager)),
-			Company:    C.GoString((*C.char)(company)),
-		},
-		ActiveSheetIdx: int(src.activeSheetIdx),
+		src:            src,
+		SheetCount:     sheetCnt,
+		sheetNames:     sheetNames,
+		xf:             parseXFTable(src, parseFontTable(src)),
+		Summary:        parseSummary(src),
+		ActiveSheetIdx: uint(uint32(src.activeSheetIdx)),
 		Charset:        C.GoString(src.charset),
 	}, nil
 }
@@ -156,4 +134,33 @@ func OpenFile(name string) (*WorkBook, error) {
 func (wb *WorkBook) Close() error {
 	C.xls_close_WB(wb.src)
 	return nil
+}
+
+func parseSummary(src *C.xlsWorkBook) *SummaryInfo {
+	summary := C.xls_summaryInfo(src)
+	defer C.xls_close_summaryInfo(summary)
+
+	title := unsafe.Pointer(summary.title)
+	subj := unsafe.Pointer(summary.subject)
+	author := unsafe.Pointer(summary.author)
+	keywords := unsafe.Pointer(summary.keywords)
+	comment := unsafe.Pointer(summary.comment)
+	lastAuthor := unsafe.Pointer(summary.lastAuthor)
+	appName := unsafe.Pointer(summary.appName)
+	category := unsafe.Pointer(summary.category)
+	manager := unsafe.Pointer(summary.manager)
+	company := unsafe.Pointer(summary.company)
+
+	return &SummaryInfo{
+		Title:      C.GoString((*C.char)(title)),
+		Subject:    C.GoString((*C.char)(subj)),
+		Author:     C.GoString((*C.char)(author)),
+		Keywords:   C.GoString((*C.char)(keywords)),
+		Comment:    C.GoString((*C.char)(comment)),
+		LastAuthor: C.GoString((*C.char)(lastAuthor)),
+		AppName:    C.GoString((*C.char)(appName)),
+		Category:   C.GoString((*C.char)(category)),
+		Manager:    C.GoString((*C.char)(manager)),
+		Company:    C.GoString((*C.char)(company)),
+	}
 }

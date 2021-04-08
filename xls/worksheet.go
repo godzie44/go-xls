@@ -25,17 +25,17 @@ func (wb *WorkBook) OpenWorkSheet(number int) (*WorkSheet, error) {
 		return nil, fmt.Errorf("work sheet %d: %w", number, err)
 	}
 
-	return &WorkSheet{src: cWS, Name: wb.sheetNames[number], Rows: parseRows(cWS)}, nil
+	return &WorkSheet{src: cWS, Name: wb.sheetNames[number], Rows: parseRows(wb, cWS)}, nil
 }
 
-func parseRows(cWS *C.xlsWorkSheet) []*Row {
-	rowCnt := int(cWS.rows.lastrow) + 1
+func parseRows(wb *WorkBook, cWS *C.xlsWorkSheet) []*Row {
+	rowCnt := int(uint16(cWS.rows.lastrow)) + 1
 	rowDataSz := unsafe.Sizeof(C.st_row_data{})
 	rows := make([]*Row, rowCnt)
 
 	rowPtr := unsafe.Pointer(cWS.rows.row)
 	for i := 0; i < rowCnt; i++ {
-		rows[i] = rowFromSrc((*C.st_row_data)(rowPtr), int(cWS.rows.lastcol)+1)
+		rows[i] = makeRow(wb, (*C.st_row_data)(rowPtr), int(uint16(cWS.rows.lastcol))+1)
 		rowPtr = unsafe.Pointer(uintptr(rowPtr) + rowDataSz)
 	}
 
