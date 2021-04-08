@@ -94,12 +94,12 @@ func TestCellValues(t *testing.T) {
 		for _, c := range tc.cases {
 			cell := ws.Rows[c.Row].Cells[c.Col]
 
-			assert.IsType(t, c.Type, cell)
+			assert.IsType(t, c.Type, cell.Value)
 
-			if _, isFloat := cell.(*FloatCell); isFloat {
-				assert.True(t, strings.Contains(cell.String(), c.StrVal))
+			if _, isFloat := cell.Value.(*FloatCell); isFloat {
+				assert.True(t, strings.Contains(cell.Value.String(), c.StrVal))
 			} else {
-				assert.Equal(t, c.StrVal, cell.String())
+				assert.Equal(t, c.StrVal, cell.Value.String())
 			}
 		}
 

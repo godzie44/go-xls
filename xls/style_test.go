@@ -33,7 +33,7 @@ func TestStyleFont(t *testing.T) {
 	defer sheet.Close()
 
 	for _, tc := range testCases {
-		st := sheet.Rows[tc.row].Cells[tc.col].Style()
+		st := sheet.Rows[tc.row].Cells[tc.col].Style
 
 		assert.Equal(t, tc.height, st.Font.Height)
 		assert.Equal(t, tc.name, st.Font.Name)
@@ -70,7 +70,7 @@ func TestStyle(t *testing.T) {
 	defer sheet.Close()
 
 	for _, tc := range testCases {
-		st := sheet.Rows[tc.row].Cells[tc.col].Style()
+		st := sheet.Rows[tc.row].Cells[tc.col].Style
 
 		assert.Equal(t, tc.align, st.Align)
 		assert.Equal(t, tc.rotation, st.Rotation)
