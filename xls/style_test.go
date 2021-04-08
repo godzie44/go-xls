@@ -24,7 +24,7 @@ func TestStyleFont(t *testing.T) {
 		{2, 3, 720, "Arial", 400, 0, 0x333399},
 	}
 
-	wb, err := OpenFile(styleFile)
+	wb, err := OpenFile(styleFile, "UTF-8")
 	assert.NoError(t, err)
 	defer wb.Close()
 
@@ -61,7 +61,7 @@ func TestStyle(t *testing.T) {
 		{2, 3, 0x20, 0x5a, 0, "xf29"},
 	}
 
-	wb, err := OpenFile(styleFile)
+	wb, err := OpenFile(styleFile, "UTF-8")
 	assert.NoError(t, err)
 	defer wb.Close()
 
@@ -80,7 +80,7 @@ func TestStyle(t *testing.T) {
 }
 
 func TestStyleTableToCSS(t *testing.T) {
-	wb, err := OpenFile(styleFile)
+	wb, err := OpenFile(styleFile, "UTF-8")
 	assert.NoError(t, err)
 	defer wb.Close()
 

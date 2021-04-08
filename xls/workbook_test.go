@@ -11,7 +11,7 @@ func TestWBOpenFile(t *testing.T) {
 	}{{smallFile}, {bigFile}}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName)
+		wb, err := OpenFile(tc.fName, "UTF-8")
 
 		assert.NoError(t, err)
 		assert.NotNil(t, wb)
@@ -39,7 +39,7 @@ func TestWBSummaryInfo(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName)
+		wb, err := OpenFile(tc.fName, "UTF-8")
 
 		assert.NoError(t, err)
 		assert.NotNil(t, wb)
@@ -66,7 +66,7 @@ func TestWBMeta(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName)
+		wb, err := OpenFile(tc.fName, "UTF-8")
 
 		assert.NoError(t, err)
 		assert.NotNil(t, wb)

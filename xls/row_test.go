@@ -17,7 +17,7 @@ func TestRowsExtract(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName)
+		wb, err := OpenFile(tc.fName, "UTF-8")
 		assert.NoError(t, err)
 
 		ws, err := wb.OpenWorkSheet(tc.SheetNumber)
@@ -84,7 +84,7 @@ func TestCellValues(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName)
+		wb, err := OpenFile(tc.fName, "UTF-8")
 		assert.NoError(t, err)
 
 		ws, err := wb.OpenWorkSheet(tc.sheetNum)

@@ -111,8 +111,8 @@ func parseWorkBook(src *C.xlsWorkBook) (*WorkBook, error) {
 	}, nil
 }
 
-func OpenFile(name string) (*WorkBook, error) {
-	encoding := C.CString("UTF-8")
+func OpenFile(name string, charset string) (*WorkBook, error) {
+	encoding := C.CString(charset)
 	defer C.free(unsafe.Pointer(encoding))
 
 	f := C.CString(name)
