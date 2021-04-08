@@ -77,5 +77,4 @@ func TestWBMeta(t *testing.T) {
 
 		wb.Close()
 	}
-
 }

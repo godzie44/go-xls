@@ -1,8 +1,6 @@
 package xls
 
 /*
-#include <stdio.h>
-#include <stdlib.h>
 #include <xls.h>
 
 typedef struct st_font_data st_font_data;

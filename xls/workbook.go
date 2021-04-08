@@ -1,10 +1,8 @@
 package xls
 
 /*
-#include <stdio.h>
 #include <stdlib.h>
 #include <xls.h>
-
 
 typedef struct st_sheet_data st_sheet_data;
 */
