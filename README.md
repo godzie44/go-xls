@@ -1,9 +1,14 @@
+![golangci-lint](https://github.com/godzie44/go-xls/workflows/golangci-lint/badge.svg) 
+![tests](https://github.com/godzie44/go-xls/workflows/tests/badge.svg) 
+[![Coverage Status](https://coveralls.io/repos/github/godzie44/go-xls/badge.svg?branch=master)](https://coveralls.io/github/godzie44/go-xls?branch=master)
+
+
 # GO-xls
-Read old Excel files (.xls) from GO. Requires **[libxls](https://github.com/libxls)**.
+GO wrapper for **[libxls](https://github.com/libxls)**. Read old Excel files (.xls) from GO.
 
 ## Install
 
-1) install libxls
+1) install **[libxls](https://github.com/libxls)**
 2) add CGO_LDFLAGS=-lxlsreader to go build / go test command.
 
 See /example/Dockerfile as example of installing required dependencies.
