@@ -11,6 +11,7 @@ import (
 	"unsafe"
 )
 
+// OpenWorkSheet opens sheet by its number, starts from 0.
 func (wb *WorkBook) OpenWorkSheet(number int) (*WorkSheet, error) {
 	cWS := C.xls_getWorkSheet(wb.src, C.int(number))
 	if cWS == nil {
@@ -18,7 +19,7 @@ func (wb *WorkBook) OpenWorkSheet(number int) (*WorkSheet, error) {
 	}
 
 	cErr := C.xls_parseWorkSheet(cWS)
-	err := libXLSErr(cErr).IntoErr()
+	err := libXLSErr(cErr).intoErr()
 	if err != nil {
 		return nil, fmt.Errorf("work sheet %d: %w", number, err)
 	}

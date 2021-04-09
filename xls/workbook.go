@@ -34,7 +34,7 @@ var (
 	errUnknown                = errors.New("unknown error")
 )
 
-func (l libXLSErr) IntoErr() error {
+func (l libXLSErr) intoErr() error {
 	switch l {
 	case noError:
 		return nil
@@ -83,7 +83,7 @@ type (
 
 func parseWorkBook(src *C.xlsWorkBook) (*WorkBook, error) {
 	cErr := C.xls_parseWorkBook(src)
-	err := libXLSErr(cErr).IntoErr()
+	err := libXLSErr(cErr).intoErr()
 	if err != nil {
 		return nil, fmt.Errorf("work book: %w", err)
 	}
@@ -111,6 +111,7 @@ func parseWorkBook(src *C.xlsWorkBook) (*WorkBook, error) {
 	}, nil
 }
 
+// OpenFile open XLS file.
 func OpenFile(name string, charset string) (*WorkBook, error) {
 	encoding := C.CString(charset)
 	defer C.free(unsafe.Pointer(encoding))
@@ -121,7 +122,7 @@ func OpenFile(name string, charset string) (*WorkBook, error) {
 	cErr := new(C.xls_error_t)
 	wb := C.xls_open_file(f, encoding, cErr)
 
-	err := libXLSErr(*cErr).IntoErr()
+	err := libXLSErr(*cErr).intoErr()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
@@ -129,13 +130,14 @@ func OpenFile(name string, charset string) (*WorkBook, error) {
 	return parseWorkBook(wb)
 }
 
+// OpenFile open XLS file from bytes buffer.
 func Open(buff []byte, charset string) (*WorkBook, error) {
 	encoding := C.CString(charset)
 	defer C.free(unsafe.Pointer(encoding))
 
 	cErr := new(C.xls_error_t)
 	wb := C.xls_open_buffer((*C.uchar)(&buff[0]), C.size_t(len(buff)), encoding, cErr)
-	err := libXLSErr(*cErr).IntoErr()
+	err := libXLSErr(*cErr).intoErr()
 	if err != nil {
 		return nil, err
 	}

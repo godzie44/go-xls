@@ -80,6 +80,7 @@ type xf struct {
 	groundColor uint16
 }
 
+// GroundColor background color (RGB).
 func (x *xf) GroundColor() uint32 {
 	return uint32(C.xls_getColor(C.WORD(x.groundColor&0x7f), 0))
 }
@@ -122,10 +123,12 @@ type CellStyle struct {
 	*xf
 }
 
+// CSSClass return cell css class name.
 func (c *CellStyle) CSSClass() string {
 	return fmt.Sprintf("xf%d", c.id)
 }
 
+// CSS return style table as list of css classes.
 func (wb *WorkBook) CSS() string {
 	css := C.xls_getCSS(wb.src)
 	defer C.free(unsafe.Pointer(css))

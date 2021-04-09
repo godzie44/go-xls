@@ -1,3 +1,4 @@
+// Package bufio implements structs and functions for working with xls files.
 package xls
 
 /*
@@ -7,6 +8,7 @@ package xls
 */
 import "C"
 
+// LibVersion return current libxls version.
 func LibVersion() string {
 	v := C.xls_getVersion()
 	return C.GoString(v)
