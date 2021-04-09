@@ -1,0 +1,30 @@
+name: golangci-lint
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install libxls
+        run: |
+          wget https://github.com/libxls/libxls/releases/download/v1.6.2/libxls-1.6.2.tar.gz \
+          && tar -xzvf libxls-1.6.2.tar.gz \
+          && cd libxls-1.6.2 \
+          && ./configure \
+          && sudo make \
+          && sudo make install \
+          && sudo ldconfig /etc/ld.so.conf.d
+        shell: bash
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.29
+        env:
+          CGO_LDFLAGS: "-lxlsreader"
