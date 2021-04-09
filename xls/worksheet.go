@@ -48,7 +48,6 @@ type WorkSheet struct {
 	Rows []*Row
 }
 
-func (ws *WorkSheet) Close() error {
+func (ws *WorkSheet) Close() {
 	C.xls_close_WS(ws.src)
-	return nil
 }

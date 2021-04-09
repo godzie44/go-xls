@@ -143,9 +143,8 @@ func Open(buff []byte, charset string) (*WorkBook, error) {
 	return parseWorkBook(wb)
 }
 
-func (wb *WorkBook) Close() error {
+func (wb *WorkBook) Close() {
 	C.xls_close_WB(wb.src)
-	return nil
 }
 
 func parseSummary(src *C.xlsWorkBook) *SummaryInfo {
