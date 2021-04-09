@@ -129,6 +129,20 @@ func OpenFile(name string, charset string) (*WorkBook, error) {
 	return parseWorkBook(wb)
 }
 
+func Open(buff []byte, charset string) (*WorkBook, error) {
+	encoding := C.CString(charset)
+	defer C.free(unsafe.Pointer(encoding))
+
+	cErr := new(C.xls_error_t)
+	wb := C.xls_open_buffer((*C.uchar)(&buff[0]), C.size_t(len(buff)), encoding, cErr)
+	err := libXLSErr(*cErr).IntoErr()
+	if err != nil {
+		return nil, err
+	}
+
+	return parseWorkBook(wb)
+}
+
 func (wb *WorkBook) Close() error {
 	C.xls_close_WB(wb.src)
 	return nil

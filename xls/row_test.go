@@ -1,12 +1,18 @@
 package xls
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"os"
 	"strings"
 	"testing"
 )
 
-func TestRowsExtract(t *testing.T) {
+type rowTS struct {
+	suite.Suite
+	openFn func(fName string, charset string) (*WorkBook, error)
+}
+
+func (suite *rowTS) TestRowsExtract() {
 	testCases := []struct {
 		fName       string
 		SheetNumber int
@@ -18,20 +24,20 @@ func TestRowsExtract(t *testing.T) {
 
 	for _, tc := range testCases {
 		wb, err := OpenFile(tc.fName, "UTF-8")
-		assert.NoError(t, err)
+		suite.NoError(err)
 
 		ws, err := wb.OpenWorkSheet(tc.SheetNumber)
-		assert.NoError(t, err)
-		assert.NotNil(t, ws)
+		suite.NoError(err)
+		suite.NotNil(ws)
 
-		assert.Len(t, ws.Rows, tc.RowCount)
+		suite.Len(ws.Rows, tc.RowCount)
 
 		ws.Close()
 		wb.Close()
 	}
 }
 
-func TestCellValues(t *testing.T) {
+func (suite *rowTS) TestCellValues() {
 	testCases := []struct {
 		fName    string
 		sheetNum int
@@ -85,25 +91,40 @@ func TestCellValues(t *testing.T) {
 
 	for _, tc := range testCases {
 		wb, err := OpenFile(tc.fName, "UTF-8")
-		assert.NoError(t, err)
+		suite.NoError(err)
 
 		ws, err := wb.OpenWorkSheet(tc.sheetNum)
-		assert.NoError(t, err)
-		assert.NotNil(t, ws)
+		suite.NoError(err)
+		suite.NotNil(ws)
 
 		for _, c := range tc.cases {
 			cell := ws.Rows[c.Row].Cells[c.Col]
 
-			assert.IsType(t, c.Type, cell.Value)
+			suite.IsType(c.Type, cell.Value)
 
 			if _, isFloat := cell.Value.(*FloatCell); isFloat {
-				assert.True(t, strings.Contains(cell.Value.String(), c.StrVal))
+				suite.True(strings.Contains(cell.Value.String(), c.StrVal))
 			} else {
-				assert.Equal(t, c.StrVal, cell.Value.String())
+				suite.Equal(c.StrVal, cell.Value.String())
 			}
 		}
 
 		ws.Close()
 		wb.Close()
 	}
+}
+
+func TestRowSuite(t *testing.T) {
+	suite.Run(t, &rowTS{
+		openFn: OpenFile,
+	})
+	suite.Run(t, &rowTS{
+		openFn: func(fName string, charset string) (*WorkBook, error) {
+			data, err := os.ReadFile(fName)
+			if err != nil {
+				return nil, err
+			}
+			return Open(data, charset)
+		},
+	})
 }

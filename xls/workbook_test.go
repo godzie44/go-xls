@@ -2,6 +2,7 @@ package xls
 
 import (
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
@@ -74,6 +75,23 @@ func TestWBMeta(t *testing.T) {
 		assert.Equal(t, tc.activeSheet, wb.ActiveSheetIdx)
 		assert.Equal(t, tc.charset, wb.Charset)
 		assert.Equal(t, tc.sheetCount, wb.SheetCount)
+
+		wb.Close()
+	}
+}
+
+func TestOpen(t *testing.T) {
+	testCases := []struct {
+		fName string
+	}{{smallFile}, {bigFile}}
+
+	for _, tc := range testCases {
+		data, err := os.ReadFile(tc.fName)
+		assert.NoError(t, err)
+
+		wb, err := Open(data, "UTF-8")
+		assert.NoError(t, err)
+		assert.NotNil(t, wb)
 
 		wb.Close()
 	}

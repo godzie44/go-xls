@@ -1,11 +1,17 @@
 package xls
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"os"
 	"testing"
 )
 
-func TestStyleFont(t *testing.T) {
+type styleTS struct {
+	suite.Suite
+	openFn func(fName string, charset string) (*WorkBook, error)
+}
+
+func (suite *styleTS) TestStyleFont() {
 	testCases := []struct {
 		row, col  int
 		height    uint16
@@ -25,25 +31,25 @@ func TestStyleFont(t *testing.T) {
 	}
 
 	wb, err := OpenFile(styleFile, "UTF-8")
-	assert.NoError(t, err)
+	suite.NoError(err)
 	defer wb.Close()
 
 	sheet, err := wb.OpenWorkSheet(0)
-	assert.NoError(t, err)
+	suite.NoError(err)
 	defer sheet.Close()
 
 	for _, tc := range testCases {
 		st := sheet.Rows[tc.row].Cells[tc.col].Style
 
-		assert.Equal(t, tc.height, st.Font.Height)
-		assert.Equal(t, tc.name, st.Font.Name)
-		assert.Equal(t, tc.bold, st.Font.Bold)
-		assert.Equal(t, tc.underline, st.Font.Underline)
-		assert.Equal(t, tc.color, st.Font.Color())
+		suite.Equal(tc.height, st.Font.Height)
+		suite.Equal(tc.name, st.Font.Name)
+		suite.Equal(tc.bold, st.Font.Bold)
+		suite.Equal(tc.underline, st.Font.Underline)
+		suite.Equal(tc.color, st.Font.Color())
 	}
 }
 
-func TestStyle(t *testing.T) {
+func (suite *styleTS) TestStyle() {
 	testCases := []struct {
 		row, col    int
 		align       byte
@@ -62,26 +68,26 @@ func TestStyle(t *testing.T) {
 	}
 
 	wb, err := OpenFile(styleFile, "UTF-8")
-	assert.NoError(t, err)
+	suite.NoError(err)
 	defer wb.Close()
 
 	sheet, err := wb.OpenWorkSheet(0)
-	assert.NoError(t, err)
+	suite.NoError(err)
 	defer sheet.Close()
 
 	for _, tc := range testCases {
 		st := sheet.Rows[tc.row].Cells[tc.col].Style
 
-		assert.Equal(t, tc.align, st.Align)
-		assert.Equal(t, tc.rotation, st.Rotation)
-		assert.Equal(t, tc.groundColor, st.GroundColor())
-		assert.Equal(t, tc.cssClass, st.CSSClass())
+		suite.Equal(tc.align, st.Align)
+		suite.Equal(tc.rotation, st.Rotation)
+		suite.Equal(tc.groundColor, st.GroundColor())
+		suite.Equal(tc.cssClass, st.CSSClass())
 	}
 }
 
-func TestStyleTableToCSS(t *testing.T) {
+func (suite *styleTS) TestStyleTableToCSS() {
 	wb, err := OpenFile(styleFile, "UTF-8")
-	assert.NoError(t, err)
+	suite.NoError(err)
 	defer wb.Close()
 
 	var expectedCSS = `.xf0{ font-size:10pt;font-family: "Arial";background:#FFFFFF;text-align:left;vertical-align:bottom;}
@@ -118,5 +124,20 @@ func TestStyleTableToCSS(t *testing.T) {
 .xf31{ font-size:16pt;font-family: "Symbola";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#993366;}
 `
 
-	assert.Equal(t, expectedCSS, wb.CSS())
+	suite.Equal(expectedCSS, wb.CSS())
+}
+
+func TestStyleSuite(t *testing.T) {
+	suite.Run(t, &styleTS{
+		openFn: OpenFile,
+	})
+	suite.Run(t, &styleTS{
+		openFn: func(fName string, charset string) (*WorkBook, error) {
+			data, err := os.ReadFile(fName)
+			if err != nil {
+				return nil, err
+			}
+			return Open(data, charset)
+		},
+	})
 }

@@ -1,11 +1,17 @@
 package xls
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"os"
 	"testing"
 )
 
-func TestOpenWS(t *testing.T) {
+type worksheetTS struct {
+	suite.Suite
+	openFn func(fName string, charset string) (*WorkBook, error)
+}
+
+func (suite *worksheetTS) TestOpenWS() {
 	testCases := []struct {
 		fName             string
 		existsSheetNum    int
@@ -16,23 +22,23 @@ func TestOpenWS(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName, "UTF-8")
-		assert.NoError(t, err)
+		wb, err := suite.openFn(tc.fName, "UTF-8")
+		suite.NoError(err)
 
 		ws, err := wb.OpenWorkSheet(tc.existsSheetNum)
-		assert.NoError(t, err)
-		assert.NotNil(t, ws)
+		suite.NoError(err)
+		suite.NotNil(ws)
 		ws.Close()
 
 		ws, err = wb.OpenWorkSheet(tc.notExistsSheetNum)
-		assert.ErrorIs(t, err, errInvalidWorkSheetNumber)
-		assert.Nil(t, ws)
+		suite.ErrorIs(err, errInvalidWorkSheetNumber)
+		suite.Nil(ws)
 
 		wb.Close()
 	}
 }
 
-func TestWSName(t *testing.T) {
+func (suite *worksheetTS) TestWSName() {
 	testCases := []struct {
 		fName                           string
 		firstSheetName, secondSheetName string
@@ -42,21 +48,36 @@ func TestWSName(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName, "UTF-8")
-		assert.NoError(t, err)
+		wb, err := suite.openFn(tc.fName, "UTF-8")
+		suite.NoError(err)
 
 		ws, err := wb.OpenWorkSheet(0)
-		assert.NoError(t, err)
-		assert.NotNil(t, ws)
-		assert.Equal(t, tc.firstSheetName, ws.Name)
+		suite.NoError(err)
+		suite.NotNil(ws)
+		suite.Equal(tc.firstSheetName, ws.Name)
 		ws.Close()
 
 		ws, err = wb.OpenWorkSheet(1)
-		assert.NoError(t, err)
-		assert.NotNil(t, ws)
-		assert.Equal(t, tc.secondSheetName, ws.Name)
+		suite.NoError(err)
+		suite.NotNil(ws)
+		suite.Equal(tc.secondSheetName, ws.Name)
 		ws.Close()
 
 		wb.Close()
 	}
+}
+
+func TestWorksheetSuite(t *testing.T) {
+	suite.Run(t, &worksheetTS{
+		openFn: OpenFile,
+	})
+	suite.Run(t, &worksheetTS{
+		openFn: func(fName string, charset string) (*WorkBook, error) {
+			data, err := os.ReadFile(fName)
+			if err != nil {
+				return nil, err
+			}
+			return Open(data, charset)
+		},
+	})
 }
