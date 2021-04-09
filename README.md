@@ -16,6 +16,9 @@ See /example/Dockerfile as example of installing required dependencies.
 ## Example
 
 ```go
+	import "github.com/godzie44/go-xls/xls"
+
+
 	wb, err := xls.OpenFile(someFile, "UTF-8")
 	if err != nil {
 		log.Fatal(err)
