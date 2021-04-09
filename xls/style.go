@@ -1,6 +1,7 @@
 package xls
 
 /*
+#include <stdlib.h>
 #include <xls.h>
 
 typedef struct st_font_data st_font_data;
@@ -126,5 +127,8 @@ func (c *CellStyle) CSSClass() string {
 }
 
 func (wb *WorkBook) CSS() string {
-	return C.GoString(C.xls_getCSS(wb.src))
+	css := C.xls_getCSS(wb.src)
+	defer C.free(unsafe.Pointer(css))
+
+	return C.GoString(css)
 }
