@@ -54,15 +54,15 @@ func (suite *rowTS) TestCellValues() {
 			Type   interface{}
 			StrVal string
 		}{
-			{0, 0, &StringCell{}, "a"},
-			{2, 1, &BlankCell{}, ""},
-			{1, 0, &FloatCell{}, "2"},
-			{16, 0, &FloatCell{}, "17"},
-			{12, 1, &StringCell{}, "This is a horizontally merged cell"},
-			{22, 1, &StringCell{}, "\"doubly quoted string\""},
-			{22, 2, &StringCell{}, "'singly quoted string'"},
-			{23, 2, &StringCell{}, "The quick brown fox"},
-			{23, 3, &FloatCell{}, "2"},
+			{0, 0, &StringValue{}, "a"},
+			{2, 1, &BlankValue{}, ""},
+			{1, 0, &FloatValue{}, "2"},
+			{16, 0, &FloatValue{}, "17"},
+			{12, 1, &StringValue{}, "This is a horizontally merged cell"},
+			{22, 1, &StringValue{}, "\"doubly quoted string\""},
+			{22, 2, &StringValue{}, "'singly quoted string'"},
+			{23, 2, &StringValue{}, "The quick brown fox"},
+			{23, 3, &FloatValue{}, "2"},
 		}},
 		{fName: bigFile, sheetNum: 0, cases: []struct {
 			Row    int
@@ -70,11 +70,11 @@ func (suite *rowTS) TestCellValues() {
 			Type   interface{}
 			StrVal string
 		}{
-			{3, 1, &StringCell{}, "Асбест "},
-			{6731, 1, &StringCell{}, "Алейская"},
-			{3, 4, &FloatCell{}, "1031.123"},
-			{6731, 4, &FloatCell{}, "1081.357"},
-			{7320, 0, &ErrCell{}, "29"},
+			{3, 1, &StringValue{}, "Асбест "},
+			{6731, 1, &StringValue{}, "Алейская"},
+			{3, 4, &FloatValue{}, "1031.123"},
+			{6731, 4, &FloatValue{}, "1081.357"},
+			{7320, 0, &ErrValue{}, "29"},
 		}},
 		{fName: bigFile, sheetNum: 11, cases: []struct {
 			Row    int
@@ -82,10 +82,10 @@ func (suite *rowTS) TestCellValues() {
 			Type   interface{}
 			StrVal string
 		}{
-			{3, 3, &StringCell{}, "Свердловская область"},
-			{6731, 3, &StringCell{}, "Алтайский край"},
-			{3, 2, &FloatCell{}, "110"},
-			{6731, 2, &FloatCell{}, "110"},
+			{3, 3, &StringValue{}, "Свердловская область"},
+			{6731, 3, &StringValue{}, "Алтайский край"},
+			{3, 2, &FloatValue{}, "110"},
+			{6731, 2, &FloatValue{}, "110"},
 		}},
 	}
 
@@ -102,10 +102,11 @@ func (suite *rowTS) TestCellValues() {
 
 			suite.IsType(c.Type, cell.Value)
 
-			if _, isFloat := cell.Value.(*FloatCell); isFloat {
-				suite.True(strings.Contains(cell.Value.String(), c.StrVal))
-			} else {
-				suite.Equal(c.StrVal, cell.Value.String())
+			switch v := cell.Value.(type) {
+			case *FloatValue:
+				suite.True(strings.Contains(v.String(), c.StrVal))
+			default:
+				suite.Equal(c.StrVal, v.String())
 			}
 		}
 

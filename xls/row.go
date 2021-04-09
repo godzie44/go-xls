@@ -58,11 +58,11 @@ func makeCell(wb *WorkBook, src *C.st_cell_data) *Cell {
 
 	switch id {
 	case recordBlank:
-		cell.Value = &BlankCell{}
+		cell.Value = &BlankValue{}
 	case recordFormula:
 		l := int64(src.l)
 		if l == 0 {
-			cell.Value = &FloatCell{
+			cell.Value = &FloatValue{
 				Val: float64(src.d),
 			}
 		} else {
@@ -73,31 +73,31 @@ func makeCell(wb *WorkBook, src *C.st_cell_data) *Cell {
 					b = true
 				}
 
-				cell.Value = &BoolCell{
+				cell.Value = &BoolValue{
 					Val: b,
 				}
 			}
 			if str == "error" {
-				cell.Value = &ErrCell{
+				cell.Value = &ErrValue{
 					Code: int32(src.d),
 				}
 
 			} else {
-				cell.Value = &StringCell{
+				cell.Value = &StringValue{
 					Val: str,
 				}
 			}
 		}
 	case recordLabelSST, recordLabel:
-		cell.Value = &StringCell{
+		cell.Value = &StringValue{
 			Val: str,
 		}
 	case recordNumber, recordRK, recordMulRK:
-		cell.Value = &FloatCell{
+		cell.Value = &FloatValue{
 			Val: float64(src.d),
 		}
 	default:
-		cell.Value = &UnknownCell{
+		cell.Value = &UnknownValue{
 			Val: str,
 		}
 	}
@@ -114,49 +114,49 @@ type Cell struct {
 	Value CellValue
 }
 
-type BlankCell struct {
+type BlankValue struct {
 }
 
-func (b *BlankCell) String() string {
+func (b *BlankValue) String() string {
 	return ""
 }
 
-type FloatCell struct {
+type FloatValue struct {
 	Val float64
 }
 
-func (f *FloatCell) String() string {
+func (f *FloatValue) String() string {
 	return strconv.FormatFloat(f.Val, 'f', -1, 64)
 }
 
-type BoolCell struct {
+type BoolValue struct {
 	Val bool
 }
 
-func (b *BoolCell) String() string {
+func (b *BoolValue) String() string {
 	return strconv.FormatBool(b.Val)
 }
 
-type ErrCell struct {
+type ErrValue struct {
 	Code int32
 }
 
-func (e *ErrCell) String() string {
+func (e *ErrValue) String() string {
 	return strconv.FormatInt(int64(e.Code), 10)
 }
 
-type StringCell struct {
+type StringValue struct {
 	Val string
 }
 
-func (s *StringCell) String() string {
+func (s *StringValue) String() string {
 	return s.Val
 }
 
-type UnknownCell struct {
+type UnknownValue struct {
 	Val string
 }
 
-func (u *UnknownCell) String() string {
+func (u *UnknownValue) String() string {
 	return u.Val
 }
