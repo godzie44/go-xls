@@ -23,7 +23,7 @@ func (suite *rowTS) TestRowsExtract() {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName, "UTF-8")
+		wb, err := suite.openFn(tc.fName, "UTF-8")
 		suite.NoError(err)
 
 		ws, err := wb.OpenWorkSheet(tc.SheetNumber)
@@ -90,7 +90,7 @@ func (suite *rowTS) TestCellValues() {
 	}
 
 	for _, tc := range testCases {
-		wb, err := OpenFile(tc.fName, "UTF-8")
+		wb, err := suite.openFn(tc.fName, "UTF-8")
 		suite.NoError(err)
 
 		ws, err := wb.OpenWorkSheet(tc.sheetNum)
@@ -108,6 +108,51 @@ func (suite *rowTS) TestCellValues() {
 			default:
 				suite.Equal(c.StrVal, v.String())
 			}
+		}
+
+		ws.Close()
+		wb.Close()
+	}
+}
+
+func (suite *rowTS) TestCellAttributes() {
+	testCases := []struct {
+		fName    string
+		sheetNum int
+		cases    []struct {
+			Row              int
+			Col              int
+			hidden           bool
+			rowspan, colspan uint16
+		}
+	}{
+		{fName: styleFile, sheetNum: 0, cases: []struct {
+			Row              int
+			Col              int
+			hidden           bool
+			rowspan, colspan uint16
+		}{
+			{0, 0, false, 0, 0},
+			{1, 4, true, 0, 0},
+			{1, 6, false, 1, 2},
+			{1, 8, false, 2, 1},
+		}},
+	}
+
+	for _, tc := range testCases {
+		wb, err := suite.openFn(tc.fName, "UTF-8")
+		suite.NoError(err)
+
+		ws, err := wb.OpenWorkSheet(tc.sheetNum)
+		suite.NoError(err)
+		suite.NotNil(ws)
+
+		for _, c := range tc.cases {
+			cell := ws.Rows[c.Row].Cells[c.Col]
+
+			suite.Equal(c.hidden, cell.Hidden)
+			suite.Equal(c.rowspan, cell.Rowspan)
+			suite.Equal(c.colspan, cell.Colspan)
 		}
 
 		ws.Close()

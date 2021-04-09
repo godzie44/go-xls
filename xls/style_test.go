@@ -30,7 +30,7 @@ func (suite *styleTS) TestStyleFont() {
 		{2, 3, 720, "Arial", 400, 0, 0x333399},
 	}
 
-	wb, err := OpenFile(styleFile, "UTF-8")
+	wb, err := suite.openFn(styleFile, "UTF-8")
 	suite.NoError(err)
 	defer wb.Close()
 
@@ -61,13 +61,13 @@ func (suite *styleTS) TestStyle() {
 		{1, 1, 0x20, 0, 0xCCCCFF, "xf22"},
 		{1, 2, 0x22, 0, 0, "xf23"},
 		{1, 3, 0x20, 0, 0, "xf24"},
-		{2, 0, 0x20, 0, 0xFFCC00, "xf26"},
-		{2, 1, 0x20, 0, 0x339966, "xf27"},
-		{2, 2, 0x23, 0, 0, "xf28"},
-		{2, 3, 0x20, 0x5a, 0, "xf29"},
+		{2, 0, 0x20, 0, 0xFFCC00, "xf27"},
+		{2, 1, 0x20, 0, 0x339966, "xf28"},
+		{2, 2, 0x23, 0, 0, "xf29"},
+		{2, 3, 0x20, 0x5a, 0, "xf30"},
 	}
 
-	wb, err := OpenFile(styleFile, "UTF-8")
+	wb, err := suite.openFn(styleFile, "UTF-8")
 	suite.NoError(err)
 	defer wb.Close()
 
@@ -86,7 +86,7 @@ func (suite *styleTS) TestStyle() {
 }
 
 func (suite *styleTS) TestStyleTableToCSS() {
-	wb, err := OpenFile(styleFile, "UTF-8")
+	wb, err := suite.openFn(styleFile, "UTF-8")
 	suite.NoError(err)
 	defer wb.Close()
 
@@ -116,12 +116,13 @@ func (suite *styleTS) TestStyleTableToCSS() {
 .xf23{ font-size:10pt;font-family: "Arial";background:#000000;text-align:center;vertical-align:bottom;color:#FFFFFF;}
 .xf24{ font-size:36pt;font-family: "Arial";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#333399;font-weight: bold;}
 .xf25{ font-size:10pt;font-family: "Arial";background:#FFFFFF;text-align:left;vertical-align:bottom;}
-.xf26{ font-size:12pt;font-family: "FreeSerif";background:#FFCC00;text-align:left;vertical-align:bottom;color:#000000;}
-.xf27{ font-size:16pt;font-family: "Symbola";background:#339966;text-align:left;vertical-align:bottom;color:#993366;}
-.xf28{ font-size:10pt;font-family: "Arial";background:#FFFFFF;text-align:right;vertical-align:bottom;color:#000000;font-weight: bold;}
-.xf29{ font-size:36pt;font-family: "Arial";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#333399;}
-.xf30{ font-size:12pt;font-family: "FreeSerif";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#000000;}
-.xf31{ font-size:16pt;font-family: "Symbola";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#993366;}
+.xf26{ font-size:10pt;font-family: "Arial";background:#FFFFFF;text-align:left;vertical-align:bottom;}
+.xf27{ font-size:12pt;font-family: "FreeSerif";background:#FFCC00;text-align:left;vertical-align:bottom;color:#000000;}
+.xf28{ font-size:16pt;font-family: "Symbola";background:#339966;text-align:left;vertical-align:bottom;color:#993366;}
+.xf29{ font-size:10pt;font-family: "Arial";background:#FFFFFF;text-align:right;vertical-align:bottom;color:#000000;font-weight: bold;}
+.xf30{ font-size:36pt;font-family: "Arial";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#333399;}
+.xf31{ font-size:12pt;font-family: "FreeSerif";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#000000;}
+.xf32{ font-size:16pt;font-family: "Symbola";background:#FFFFFF;text-align:left;vertical-align:bottom;color:#993366;}
 `
 
 	suite.Equal(expectedCSS, wb.CSS())

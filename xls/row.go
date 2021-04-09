@@ -53,7 +53,10 @@ func makeCell(wb *WorkBook, src *C.st_cell_data) *Cell {
 	str := C.GoString(src.str)
 
 	cell := &Cell{
-		Style: &CellStyle{uint16(src.xf), wb.xf[uint16(src.xf)]},
+		Style:   &CellStyle{uint16(src.xf), wb.xf[uint16(src.xf)]},
+		Hidden:  uint8(src.isHidden) != 0,
+		Rowspan: uint16(src.rowspan),
+		Colspan: uint16(src.colspan),
 	}
 
 	switch id {
@@ -110,8 +113,11 @@ type CellValue interface {
 }
 
 type Cell struct {
-	Style *CellStyle
-	Value CellValue
+	Style   *CellStyle
+	Value   CellValue
+	Hidden  bool
+	Rowspan uint16
+	Colspan uint16
 }
 
 type BlankValue struct {
